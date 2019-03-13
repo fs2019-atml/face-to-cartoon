@@ -2,7 +2,7 @@
 TBD
 
 ## Project description
-We plan to train a [https://junyanz.github.io/CycleGAN/](CycleGAN) on cartoon faces.
+We plan to train a [CycleGAN](https://junyanz.github.io/CycleGAN/) on cartoon faces.
 
 ## Git Workflow
 Just use classic merge commits if you found out that someone has pushed in meantime.
@@ -17,6 +17,6 @@ Just use classic merge commits if you found out that someone has pushed in meant
 | 5    	|            	|         	|      	|
 
 ## Markdown O.o
-Help is here: [https://guides.github.com/features/mastering-markdown/]
+Help is here: https://guides.github.com/features/mastering-markdown/
 
 
