@@ -5,7 +5,7 @@ TBD
 We plan to train a [CycleGAN](https://junyanz.github.io/CycleGAN/) on cartoon faces.
 
 ## Git Workflow
-Just use classic merge commits if you found out that someone has pushed in meantime.
+Just use classic merge commits if you find out that someone has pushed in meantime.
 
 ## Project plan
 | Week 	| Suggestion 	| Planned 	| Done 	|
