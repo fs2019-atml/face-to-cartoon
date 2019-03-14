@@ -10,7 +10,7 @@ Just use classic merge commits if you find out that someone has pushed in meanti
 ## Project plan
 | Week 	| Suggestion 	| Planned 	| Done 	|
 |------	|------------	|---------	|------	|
-| 11    	| Read literature           	| Data collection, Project description        	|      	|
+| 11    	|           	| Literature, Data collection, Project description        	|      	|
 | 12    	|            	|         	|      	|
 | 13    	|            	|         	|      	|
 | 14    	|            	|         	|      	|
