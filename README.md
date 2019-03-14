@@ -10,11 +10,11 @@ Just use classic merge commits if you find out that someone has pushed in meanti
 ## Project plan
 | Week 	| Suggestion 	| Planned 	| Done 	|
 |------	|------------	|---------	|------	|
-| 1    	|            	|         	|      	|
-| 2    	|            	|         	|      	|
-| 3    	|            	|         	|      	|
-| 4    	|            	|         	|      	|
-| 5    	|            	|         	|      	|
+| 11    	| Read literature           	| Data collection, Project description        	|      	|
+| 12    	|            	|         	|      	|
+| 13    	|            	|         	|      	|
+| 14    	|            	|         	|      	|
+| 15    	|            	|         	|      	|
 
 ## Markdown O.o
 Help is here: https://guides.github.com/features/mastering-markdown/
