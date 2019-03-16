@@ -1,6 +1,11 @@
 **Database Faces:**  
-[Wilma Bainbridge](http://www.wilmabainbridge.com/facememorability2.html)  
-[Yale Database B](http://vision.ucsd.edu/content/extended-yale-face-database-b-b) (Grey)  
+[Wilma Bainbridge](http://www.wilmabainbridge.com/facememorability2.html) (>10k pics)  
+[Ohio State University](http://www2.ece.ohio-state.edu/~aleix/ARdatabase.html) (126 subs, >4000 pics, with sun glasses)  
+[Iranian Face Database](http://www.iranprc.org/en/ifdb.php) (>600 subs, >3600 pics)  
+[Texas 3D Face Recognition Database](http://live.ece.utexas.edu/research/texas3dfr/) (>100 subs, >1100 pics, landmarks)  
+[Eurecom Kintec Face Database](http://rgb-d.eurecom.fr/) (>50 subs, >450 pics, sun glasses)  
+
+
 
 **Database Cartoons:**  
 [Cartoon Set](https://google.github.io/cartoonset/index.html)  
