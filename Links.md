@@ -1,9 +1,10 @@
 **Database Faces:**  
 [Wilma Bainbridge](http://www.wilmabainbridge.com/facememorability2.html) (>10k pics)  
-[Ohio State University](http://www2.ece.ohio-state.edu/~aleix/ARdatabase.html) (126 subs, >4000 pics, with sun glasses)  
+[Ohio State University](http://www2.ece.ohio-state.edu/~aleix/ARdatabase.html) (>120 subs, >4000 pics, with sun glasses)  
 [Iranian Face Database](http://www.iranprc.org/en/ifdb.php) (>600 subs, >3600 pics)  
 [Texas 3D Face Recognition Database](http://live.ece.utexas.edu/research/texas3dfr/) (>100 subs, >1100 pics, landmarks)  
 [Eurecom Kintec Face Database](http://rgb-d.eurecom.fr/) (>50 subs, >450 pics, sun glasses)  
+[LFWcropped](http://conradsanderson.id.au/lfwcrop/) (>13k pics, close look without hair, from Labeled Faces in the Wild database)  
 
 
 
