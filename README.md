@@ -11,6 +11,12 @@ Using the CycleGAN as baseline we will investigate on more techniques and tricks
 ## Project description
 We plan to train a [CycleGAN](https://junyanz.github.io/CycleGAN/) on cartoon faces.
 
+## DCGAN
+We trained a vanilla DCGAN on the cartoon dataset (10k) in order to learn
+how to generate women with beards:
+
+![dcgan](doc/images/dcgan-fake-samples.png)
+
 ## Git Workflow
 Just use classic merge commits if you find out that someone has pushed in meantime.
 
