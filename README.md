@@ -14,7 +14,7 @@ We plan to train a [CycleGAN](https://junyanz.github.io/CycleGAN/) on cartoon fa
 We trained a vanilla DCGAN on the cartoon dataset (10k) in order to learn
 how to generate women with beards:
 
-![dcgan](doc/images/dcgan-fake-samples.png)
+![dcgan](doc/images/dcgan-fake-sample.png)
 
 ## Git Workflow
 Just use classic merge commits if you find out that someone has pushed in meantime.
