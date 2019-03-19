@@ -4,6 +4,7 @@
 [Iranian Face Database](http://www.iranprc.org/en/ifdb.php) (>600 subs, >3600 pics)  
 [Texas 3D Face Recognition Database](http://live.ece.utexas.edu/research/texas3dfr/) (>100 subs, >1100 pics, landmarks)  
 [Eurecom Kintec Face Database](http://rgb-d.eurecom.fr/) (>50 subs, >450 pics, sun glasses)  
+[Labeled Faces in the Wild (LFW)] (http://vis-www.cs.umass.edu/lfw/) (>13k pics, in various situations)  
 [LFWcropped](http://conradsanderson.id.au/lfwcrop/) (>13k pics, close look without hair, from Labeled Faces in the Wild database)  
 
 
