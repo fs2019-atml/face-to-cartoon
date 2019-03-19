@@ -34,8 +34,8 @@ To edit use: https://www.tablesgenerator.com/markdown_tables
 | 2    	| identify challenges       	|                                                  	|      	|
 | 3    	| read literature           	|                                                  	|      	|
 | 4    	| propose solution          	|                                                  	|      	|
-| 5    	| propose solution          	| Literature, Data collection, Project description 	|      	|
-| 6    	| propose solution (due A1) 	|                                                  	|      	|
+| 5    	| propose solution          	| literature, search for data, project description 	| yes  	|
+| 6    	| propose solution (due A1) 	| download data, implement Prototype, preprocessing |    	  |
 | 7    	| data preparation          	|                                                  	|      	|
 | 8    	| coding                    	|                                                  	|      	|
 | 9    	| coding (due A2)           	|                                                  	|      	|
