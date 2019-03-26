@@ -36,7 +36,7 @@ To edit use: https://www.tablesgenerator.com/markdown_tables
 | 4    	| propose solution          	|                                                  	|      	|
 | 5    	| propose solution          	| literature, search for data, project description 	| yes  	|
 | 6    	| propose solution (due A1) 	| download data, implement Prototype, preprocessing |    	  |
-| 7    	| data preparation          	|                                                  	|      	|
+| 7    	| data preparation          	| everybody runs cycleGAN                         	|      	|
 | 8    	| coding                    	|                                                  	|      	|
 | 9    	| coding (due A2)           	|                                                  	|      	|
 | 10   	| easter holiday            	|                                                  	|      	|
