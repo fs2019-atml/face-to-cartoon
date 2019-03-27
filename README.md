@@ -7,7 +7,17 @@ As well as two standard GAN losses of each mapping function.
 
 Using the CycleGAN as baseline we will investigate on more techniques and tricks to improve the results.
 
-## Project description
+## Introduction
+Cartoons have their own field in illustration and every artist creates his own style and strokes. Once a style is settled, many artist are able to copy and adapt the patterns and exaggerations. Faces, on the other hand, are hard to draw and also to adapt in style: the right proportions and asymmetries have to match each other perfectly.
+
+The aim of this project is to automatically create faces in the style of the artist Shiraz Fuman. Our creations can then be used as starting point for your own face cartoon or used directly.
+
+A nice property of the CycleGAN approach is to represent the overall structure of the transformed input image: the face will have the same proportions and boundaries like the natural capture. This brings much more liveliness to the drawings.
+
+![demo](doc/images/cyclegan-demo.jpg)
+
+Using a CycleGAN 
+
 We plan to train a [CycleGAN](https://junyanz.github.io/CycleGAN/) on cartoon faces.
 
 ## DCGAN
