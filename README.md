@@ -46,8 +46,8 @@ To edit use: https://www.tablesgenerator.com/markdown_tables
 | 4    	| propose solution          	|                                                  	|      	|
 | 5    	| propose solution          	| literature, search for data, project description 	| yes  	|
 | 6    	| propose solution (due A1) 	| download data, preprocessing ides (not much)      | yes   |
-| 7    	| data preparation          	| everybody runs cycleGAN                         	|      	|
-| 8    	| coding                    	|                                                  	|      	|
+| 7    	| data preparation          	| everybody runs cycleGAN                         	| some  |
+| 8    	| coding                    	| train on cropped faces, start implementation    	|      	|
 | 9    	| coding (due A2)           	|                                                  	|      	|
 | 10   	| easter holiday            	|                                                  	|      	|
 | 11   	| net training              	|                                                  	|      	|
@@ -55,6 +55,23 @@ To edit use: https://www.tablesgenerator.com/markdown_tables
 | 13   	| experiments               	|                                                  	|      	|
 | 14   	| Report & Presentation     	|                                                  	|      	|
 | 15   	| Review                    	|                                                  	|      	|
+
+## Tasks for own implementation
+
+We define the faces as domain A, the cartoons as domain B. We store the images in folders under:
+./datasets/customName/{trainA, trainB, testA, testB}. The results under ./results/customName/.
+
+To work on a task, put your name in the column!
+
+
+| Task                    	| Description                                                                                                                    	| Assigned 	| Status 	|
+|-------------------------	|--------------------------------------------------------------------------------------------------------------------------------	|----------	|--------	|
+| Parse command line args 	| Provide a way to store and retrieve configurations.                                                                            	|          	|        	|
+| DataLoader              	| Load and preprocess (crop) images out of the folders trainA, trainB, testA, testB                                              	| Jan      	|        	|
+| CycleGAN Training       	| - Create some first architectures for the Generator{A2B, B2A} and Discriminator{A, B} Networks. - Implement training procedure 	|          	|        	|
+| CycleGAN Test           	| - Implement test procedure "run GeneratorA2B"                                                                                  	|          	|        	|
+| Training Visualization  	| - Dump learning rates (per Network) - Dump network weights - visualize reconstruction "A to B to A"                            	|          	|        	|
+| Test Visualization      	| have fun ...                                                                                                                   	|          	|        	|
 
 ## Markdown O.o
 Help is here: https://guides.github.com/features/mastering-markdown/
