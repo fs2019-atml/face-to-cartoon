@@ -56,12 +56,12 @@ To edit use: https://www.tablesgenerator.com/markdown_tables
 | 14   	| Report & Presentation     	|                                                  	|      	|
 | 15   	| Review                    	|                                                  	|      	|
 
-## Tasks for own implementation
+## Issues
 
 We define the faces as domain A, the cartoons as domain B. We store the images in folders under:
 ./datasets/customName/{trainA, trainB, testA, testB}. The results under ./results/customName/.
 
-To work on a task, put your name in the column!
+To work on a task, put your name in the column and shout to slack!
 
 
 | Task                    	| Description                                                                                                                    	| Assigned 	| Status 	|
