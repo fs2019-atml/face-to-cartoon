@@ -4,7 +4,7 @@ from . import networks
 
 class TestModel(BaseModel):
     """ This TesteModel can be used to generate CycleGAN results for only one direction.
-    This model will automatically set '--dataset_mode single', which only loads the images from one collection.
+    This model will automatically set '--dataset_mode face', which only loads the images from one collection.
 
     See the test instruction for more details.
     """
@@ -23,8 +23,10 @@ class TestModel(BaseModel):
         You need to specify the network using the option '--model_suffix'.
         """
         assert not is_train, 'TestModel cannot be used during training time'
-        parser.set_defaults(dataset_mode='single')
-        parser.add_argument('--model_suffix', type=str, default='', help='In checkpoints_dir, [epoch]_net_G[model_suffix].pth will be loaded as the generator.')
+        #### GROUP5 Code ####
+        parser.set_defaults(dataset_mode='face')
+        parser.add_argument('--model_suffix', type=str, default='_A', help='In checkpoints_dir, [epoch]_net_G[model_suffix].pth will be loaded as the generator.')
+        #### END of code ####        
 
         return parser
 
@@ -42,8 +44,8 @@ class TestModel(BaseModel):
         self.visual_names = ['real_A', 'fake_B']
         # specify the models you want to save to the disk. The training/test scripts will call <BaseModel.save_networks> and <BaseModel.load_networks>
         self.model_names = ['G' + opt.model_suffix]  # only generator is needed.
-        self.netG = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG,
-                                      opt.norm, not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
+        self.netG = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
+                                        not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
 
         # assigns the model to self.netG_[suffix] so that it can be loaded
         # please see <BaseModel.load_networks>

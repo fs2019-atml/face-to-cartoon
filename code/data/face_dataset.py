@@ -88,7 +88,7 @@ class FaceDataset(BaseDataset):
 
     def get_transform_wide(self, centerCrop=False, resize=False):
         """
-        Transforms the input image to the "big" size of 304
+        Transforms the input image to the "big" size of 280
         """        
         transform_list = []
         
