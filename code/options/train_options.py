@@ -6,6 +6,10 @@ class TrainOptions(BaseOptions):
 
     It also includes shared options defined in BaseOptions.
     """
+    
+    #### GROUP5 code ####
+    # We updated some default parameters for our needs
+    #### END of code ####
 
     def initialize(self, parser):
         parser = BaseOptions.initialize(self, parser)

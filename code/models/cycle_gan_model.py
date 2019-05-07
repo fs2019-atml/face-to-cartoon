@@ -42,8 +42,11 @@ class CycleGANModel(BaseModel):
             parser.add_argument('--lambda_B', type=float, default=10.0, help='weight for cycle loss (B -> A -> B)')
             #disable lambda identity:
             parser.add_argument('--lambda_identity', type=float, default=0.0, help='use identity mapping. Setting lambda_identity other than 0 has an effect of scaling the weight of the identity mapping loss. For example, if the weight of the identity loss should be 10 times smaller than the weight of the reconstruction loss, please set lambda_identity = 0.1')
+            
+            #### GROUP5 code ####
             #enable lambda landmark:
             parser.add_argument('--lambda_landmark', type=float, default=0.01, help='loss of landmark detection')
+            #### END of code ####
 
         return parser
 
@@ -73,6 +76,10 @@ class CycleGANModel(BaseModel):
         # define networks (both Generators and discriminators)
         # The naming is different from those used in the paper.
         # Code (vs. paper): G_A (G), G_B (F), D_A (D_Y), D_B (D_X)
+        
+        #### GROUP5 code ####
+        # define our custom networks and optimizers
+        
         self.netG_A = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
                                         not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
         self.netG_B = networks.define_G(opt.output_nc, opt.input_nc, opt.ngf, opt.netG, opt.norm,
@@ -103,6 +110,8 @@ class CycleGANModel(BaseModel):
             self.optimizers.append(self.optimizer_G)
             self.optimizers.append(self.optimizer_D)
             self.optimizers.append(self.optimizer_LD)
+        
+        #### END of code ####
 
     def set_input(self, input):
         """Unpack input data from the dataloader and perform necessary pre-processing steps.
@@ -110,16 +119,16 @@ class CycleGANModel(BaseModel):
         Parameters:
             input (dict): include the data itself and its metadata information.
 
-        The option 'direction' can be used to swap domain A and domain B.
         """
-        AtoB = self.opt.direction == 'AtoB'
-        theA = input['A' if AtoB else 'B']
-        theB = input['B' if AtoB else 'A']
+        #### GROUP5 code ####
+        theA = input['A']
+        theB = input['B']
         self.real_A = theA['img'].to(self.device)
         self.real_B = theB['img'].to(self.device)
         self.ld_A = theA['ld'].to(self.device)
         self.ld_B = theB['ld'].to(self.device)
-        self.image_paths = input['A_paths' if AtoB else 'B_paths']
+        self.image_paths = input['A_paths']
+        #### END of code ####
 
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
@@ -165,7 +174,8 @@ class CycleGANModel(BaseModel):
             
             only on ground truth
             '''
-        #lambda_ld_a = self.opt.lambda_landmark * 0.0001
+        #### GROUP5 code ####
+
         # dont get confused:
         pred_A = self.netLD_A(self.real_B)
         self.loss_LD_A = self.criterionGAN_LD(pred_A, self.ld_B)
@@ -174,10 +184,15 @@ class CycleGANModel(BaseModel):
         pred_B = self.netLD_B(self.real_A)
         self.loss_LD_B = self.criterionGAN_LD(pred_B, self.ld_A)
         self.loss_LD_B.backward()
+        #### END of code ####
         
 
     def backward_G(self):
         """Calculate the loss for generators G_A and G_B"""
+        
+        #### GROUP5 code ####
+        # incorporate the landmark loss to the generator loss
+        
         lambda_idt = self.opt.lambda_identity
         lambda_A = self.opt.lambda_A
         lambda_B = self.opt.lambda_B
@@ -210,6 +225,8 @@ class CycleGANModel(BaseModel):
         # combined loss and calculate gradients
         self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_GLD_A + self.loss_GLD_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B
         self.loss_G.backward()
+        
+        #### END of code ####
 
     def optimize_parameters(self):
         """Calculate losses, gradients, and update network weights; called in every training iteration"""
@@ -226,9 +243,12 @@ class CycleGANModel(BaseModel):
         self.backward_D_A()      # calculate gradients for D_A
         self.backward_D_B()      # calculate graidents for D_B
         self.optimizer_D.step()  # update D_A and D_B's weights
+        
+        #### GROUP5 code ####
         # LD_A and LD_B:
         self.optimizer_LD.zero_grad()
         self.backward_LD()
         self.optimizer_LD.step()
+        #### END of code ####
 
         

@@ -151,6 +151,12 @@ def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, in
         raise NotImplementedError('Generator model name [%s] is not recognized' % netG)
     return init_net(net, init_type, init_gain, gpu_ids)
 
+
+#### GROUP5 code ####
+# This is the network for the landmark detection
+# based on paper xxx. TODO: name?
+
+
 class LDNet(nn.Module):
     
     def __init__(self):
@@ -203,6 +209,8 @@ def define_LD(gpu_ids=[]):
     net = LDNet()
     return init_net(net, gpu_ids=gpu_ids)
 
+#### END of code ####
+
 def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal', init_gain=0.02, gpu_ids=[]):
     """Create a discriminator
 
@@ -250,6 +258,11 @@ def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal'
 ##############################################################################
 # Classes
 ##############################################################################
+    
+#### GROUP5 code ####
+# This loss function is used for the predicted landmarks
+# and train the landmark detector.
+
 class GANLossLD(nn.Module):
     """Define GAN objective on 5 Landmarks"""
     
@@ -266,7 +279,8 @@ class GANLossLD(nn.Module):
 
         loss = self.loss_function(p, t)
         return loss
-    
+
+#### END of code ####  
     
 class GANLoss(nn.Module):
     """Define different GAN objectives.

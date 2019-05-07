@@ -8,7 +8,9 @@ import torch
 import torchvision.transforms as transforms
 
 
-class UnalignedDataset(BaseDataset):
+#### GROUP5 code ####
+
+class FaceDataset(BaseDataset):
     """
     This dataset class can load unpaired face datasets.
 
@@ -18,11 +20,13 @@ class UnalignedDataset(BaseDataset):
     
     under --dataroot we assume the following structure:
         '099000_landmarks' a file with the landmarks of the real faces.
-        'cartoon_10k_png' a folder with all the cartoon faces.
+        'cartoon_conditional' a folder with all the cartoon faces.
         
     These choices are not the most general ones but easy to use in our context.
 
-    During test time we expect the real faces under --dataroot/test.
+    During test time we expect the real faces under <--dataroot>/test.
+    
+    Authors: mostly group05
     """
 
     def __init__(self, opt):
@@ -37,6 +41,11 @@ class UnalignedDataset(BaseDataset):
         assert opt.input_nc == 3
         assert opt.output_nc == 3
         assert opt.direction == 'AtoB'
+        assert opt.load_size == 256
+        assert opt.crop_size == 256
+        
+        # the wide size indicates the wide dimension before the random crop.
+        self.wide_size = 280        
         
         # read out landmarks files to store paths and landmarks in A:
         
@@ -45,7 +54,7 @@ class UnalignedDataset(BaseDataset):
         # - the first token is the relative path
         # - the following tokens are the coordinates of 5 landmarks: <x1 y1>
         # - the 5 landmarks are: left eye, right eye, nose, left mouth edge, right mouth edge
-        # (definition left: x1 more left x2 <=> x1 < x2, origin: top left corner)
+        # (definition left: x1 "more left than" x2 <=> x1 < x2, origin: top left corner)
         #############################
         
         self.A_paths = []
@@ -64,8 +73,7 @@ class UnalignedDataset(BaseDataset):
                 tokens = [path, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 self.A_paths.append(tokens)
         
-        #self.dir_B = os.path.join(opt.dataroot, 'cartoon_orange_hair_crop')  # create a path '/path/to/data/trainB'
-        self.dir_B = os.path.join(opt.dataroot, 'cartoon10k_png')
+        self.dir_B = os.path.join(opt.dataroot, 'cartoon_conditional')
         
         self.B_paths = sorted(make_dataset(self.dir_B, opt.max_dataset_size))    # load images from '/path/to/data/trainB'
         self.A_size = len(self.A_paths)  # get the size of dataset A
@@ -73,45 +81,34 @@ class UnalignedDataset(BaseDataset):
         
         print('lenghtA:', self.A_size, 'lengthB:', self.B_size)
         
-        self.transform_A_wide = self.get_transform_304()
-        self.transform_B_wide = self.get_transform_304(centerCrop=True)
+        self.transform_A_wide = self.get_transform_wide(resize=True)
+        self.transform_B_wide = self.get_transform_wide()
         self.transform_A = self.get_transform()
         self.transform_B = self.get_transform()
 
-    def get_transform_304(self, centerCrop=False, isSpecial=False):
+    def get_transform_wide(self, centerCrop=False, resize=False):
         """
         Transforms the input image to the "big" size of 304
         """        
         transform_list = []
         
-        if (isSpecial):
-            transform_list.append(transforms.Resize(304))
-            transform_list.append(transforms.CenterCrop(304))
+        if (resize):
+            transform_list.append(transforms.Resize(self.wide_size, Image.BICUBIC))
 
         if (centerCrop):
-            transform_list.append(transforms.CenterCrop(304))
-        
-        # blow up (not required)
-        # method=Image.BICUBIC
-        # transform_list.append(transforms.Resize([288, 288], method))
+            transform_list.append(transforms.CenterCrop(self.wide_size))
         
         return transforms.Compose(transform_list)
 
-    def get_transform(self, centerCrop=False):
+    def get_transform(self):
         """
         Transforms the image to a normalized tensor
         """
-        transform_list = []
-        transform_list += [transforms.ToTensor(),
+        transform_list = [transforms.ToTensor(),
                            transforms.Normalize((0.5, 0.5, 0.5),
                                                 (0.5, 0.5, 0.5))]        
         return transforms.Compose(transform_list)
     
-    def get_rand_upperleft(self):
-        """ Returns two random values between 0 and 48 (excluded)
-        This can be used to crop a image randomly and move the landmarks accordingly"""
-        return torch.FloatTensor(2).uniform_(0,48).floor()
-
     def __getitem__(self, index):
         """Return a data point and its metadata information.
 
@@ -132,55 +129,62 @@ class UnalignedDataset(BaseDataset):
             index_B = random.randint(0, self.B_size - 1)
         B_path = self.B_paths[index_B]
         
+        # Load and convert image A
         A_img = Image.open(A_path).convert('RGB')
         A_img = self.transform_A_wide(A_img)
         A_rand = self.get_rand_upperleft()
-        A_img = transforms.functional.crop(A_img, int(A_rand[1].item()), int(A_rand[0].item()), 256, 256)
+        A_img = self.random_crop(A_img, A_rand)
         A_landmarks = torch.tensor([[float(A_tokens[1]), float(A_tokens[2])],
                                     [float(A_tokens[3]), float(A_tokens[4])],
                                     [float(A_tokens[5]), float(A_tokens[6])],
                                     [float(A_tokens[7]), float(A_tokens[8])],
                                     [float(A_tokens[9]), float(A_tokens[10])]])
         
+        # Load and convert image B
         B_img = Image.open(B_path).convert('RGB')
         B_img = self.transform_B_wide(B_img)
         B_rand = self.get_rand_upperleft()
-        B_img = transforms.functional.crop(B_img, int(B_rand[1].item()), int(B_rand[0].item()), 256, 256)
+        B_img = self.random_crop(B_img, B_rand)
 
 
-        # full size cartoons:
+        # full size cartoon landmarks:
         B_landmarks = torch.tensor([self.ld(205, 261),
                                     self.ld(295, 261),
                                     self.ld(249, 308),
                                     self.ld(224, 332),
                                     self.ld(274, 332)])
-        #resize_factor_b = 256.0/500.0
-
-        # cropped red hair:
-        #B_landmarks = torch.tensor([self.ld(86, 140),
-        #                            self.ld(173, 141),
-        #                            self.ld(130, 190),
-        #                            self.ld(109, 213),
-        #                            self.ld(154, 212)])
 
         # process landmarks on faces:
-        # random crop: 304 -> 256
+        # scale down 304 -> 280:
+        A_landmarks *= 280.0/304.0
+        # random crop: 280 -> 256        
         A_landmarks -= A_rand
         
-        # process landmarks on orange cartoons:
-        # center crop: 500 -> 304:
-        B_landmarks -= torch.Tensor([98, 98])
-        # random crop: 304 -> 256
+        # process landmarks on cartoons:
+        # center crop: 500 -> 280:
+        B_landmarks -= torch.Tensor([110, 110])
+        # random crop: 280 -> 256
         B_landmarks -= B_rand
+    
+        
+        # TODO: add the conditional encoding here to the B stuff
     
         # apply image transformation
         A = {'img': self.transform_A(A_img), 'ld': A_landmarks}
-        B = {'img': self.transform_B(B_img), 'ld': B_landmarks}
+        B = {'img': self.transform_B(B_img), 'ld': B_landmarks}        
 
         return {'A': A, 'B': B, 'A_paths': A_path, 'B_paths': B_path}
 
     def ld(self, x, y):
         return [float(x), float(y)]
+    
+    def get_rand_upperleft(self):
+        """ Returns two random values between 0 and 24 (excluded)
+        This can be used to crop a image randomly and move the landmarks accordingly"""
+        return torch.FloatTensor(2).uniform_(0,self.wide_size-256).floor()
+    
+    def random_crop(self, img, rand):
+        return transforms.functional.crop(img, int(rand[1].item()), int(rand[0].item()), 256, 256) # random crop
 
     def __len__(self):
         """Return the total number of images in the dataset.
@@ -189,3 +193,6 @@ class UnalignedDataset(BaseDataset):
         we take a maximum of
         """
         return max(self.A_size, self.B_size)
+
+
+#### END of code ####
