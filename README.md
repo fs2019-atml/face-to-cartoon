@@ -1,4 +1,4 @@
-# Conditional cartoon faces incorporating a landmark loss in cycleGAN
+# Conditional cartoon faces incorporating a landmark loss in CycleGAN
 We learn how to map a face to a cartoon-face only using unpaired data. For a certain face the mapping to a cartoon style is a complex function ![functionG](doc/images/function-g.png). The goal of this project is to learn this function! As starting point we choose CycleGAN.
 CycleGAN promises to learn the mapping from
 ![functionG](doc/images/function-g.png) and its reverse ![functionH](doc/images/function-h.png)
