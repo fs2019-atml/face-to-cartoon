@@ -1,11 +1,15 @@
-# face-to-cartoon
+# Conditional cartoon faces incorporating a landmark loss in cycleGAN
 We learn how to map a face to a cartoon-face only using unpaired data. For a certain face the mapping to a cartoon style is a complex function ![functionG](doc/images/function-g.png). The goal of this project is to learn this function! As starting point we choose CycleGAN.
 CycleGAN promises to learn the mapping from
 ![functionG](doc/images/function-g.png) and its reverse ![functionH](doc/images/function-h.png)
 using unpaired data. The main idea is to minimize the loss of the transitive "cycle" ![eq](doc/images/transitive.png).
-As well as two standard GAN losses of each mapping function.
+As well as a standard GAN Discriminator losses of each mapping function.
 
-Using the CycleGAN as baseline we will investigate on more techniques and tricks to improve the results.
+Our contributions:
+
+In order to incorporate additional prior knowledge to the architecture we add another loss term based on landmark predictions. For both: the cartoons and the real images.
+
+To extend the usages of our model we provide a one to ten mapping of real faces to cartoon images: We make the whole architecutre conditional and train the models with ten different hair colors. You are free to choose your color!
 
 ## Introduction
 Cartoons have their own field in illustration and every artist creates his own style and strokes. Once a style is settled, many artist are able to copy and adapt the patterns and exaggerations. Faces, on the other hand, are hard to draw and also to adapt in style: the right proportions and asymmetries have to match each other perfectly.
