@@ -51,12 +51,12 @@ To edit use: https://www.tablesgenerator.com/markdown_tables
 | 5    	| propose solution          	| literature, search for data, project description 	| yes  	|
 | 6    	| propose solution (due A1) 	| download data, preprocessing ides (not much)      | yes   |
 | 7    	| data preparation          	| everybody runs cycleGAN                         	| some  |
-| 8    	| coding                    	| train on cropped faces, start implementation    	|      	|
+| 8    	| coding                    	| train on cropped faces, start implementation    	| yes  	|
 | 9    	| coding (due A2)           	|                                                  	|      	|
-| 10   	| easter holiday            	|                                                  	|      	|
-| 11   	| net training              	|                                                  	|      	|
-| 12   	| net training              	|                                                  	|      	|
-| 13   	| experiments               	|                                                  	|      	|
+| 10   	| easter holiday            	| break                                           	| yes  	|
+| 11   	| net training              	| landmark loss, own datasets, more training      	| yes 	|
+| 12   	| net training              	| landmark loss and conditional implementation    	| yes  	|
+| 13   	| experiments               	| merge code base, implement showcase             	|      	|
 | 14   	| Report & Presentation     	|                                                  	|      	|
 | 15   	| Review                    	|                                                  	|      	|
 
