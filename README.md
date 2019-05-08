@@ -20,6 +20,34 @@ The CycleGAN approach respects the overall structure of the transformed input im
 
 ![demo](doc/images/cyclegan-demo.jpg)
 
+## Related approaches
+
+### DCGAN
+The usual approach is to train directly on the discriminator loss and force the GAN to learn comics without restrictions.
+To start we trained a vanilla DCGAN leading to the following result.
+
+![dcgan](doc/images/dcgan-fake-sample.png)
+
+The generator has learnt to combine various features of the cartoon dataset into new ones. But the results are not
+acceptable: deeper structures like same skin color everywhere have not been learnt.
+
+As the cartoon dataset contains women with beards we can not blame the generator. The input of the generator was
+gaussian noise and not real face images.
+
+### Vanilla CycleGAN
+Next thing to consider is the vanilla CycleGAN. The paper promises a more restriced environment for better results.
+The first results are acceptable. But we discover two problems: the first is a mode collapse: the generator only generates
+a few modes of the original cartoon dataset. The second is the liveliness in the generated cartoons: they look exactly like
+the cartoon data, but we want something inbetween. Humans turn and move their head and eyes. We would like to 
+incorporate this feature to the generated cartoons to have more correspondence between the input face and the generated cartoon.
+
+.. various image of the problems ..
+
+## Contributions
+
+### Landmark loss in CycleGAN
+We are on the edge of supervised and unsupervised learning. 
+
 Using a CycleGAN 
 
 We plan to train a [CycleGAN](https://junyanz.github.io/CycleGAN/) on cartoon faces.
