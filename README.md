@@ -52,9 +52,25 @@ correspondence on their landmarks: a fake should preserve the landmarks of the i
 To do so we add a new loss term called landmark loss next to the cycle and discriminator loss:
 ![loss](doc/images/loss.png). In other words: during training time the generator gets his gradients from the discriminator, the cycle and the landmark detection. The balance of the lambdas which gives the weights to each loss are very important, as
 this landmark loss can now create a state where it is very easy for the discriminator to separate real from fakes.
-Experiments have shown that a small landmark lambda of 0.01 (the discriminator has a lambda of one) helps with the correspondence without destroying the overall learning.
+Experiments have shown that a small landmark lambda of 0.01 helps with the correspondence without destroying the overall learning (the discriminator has a lambda of 1.0).
 
 ![landmark correspondences](doc/images/landmark-correspondences.png)
+
+We do the landmark detection with a convolutional landmark detection network with several layers.
+In each training batch, We train the two landmark detectors LD_A on real faces and the LD_B on cartoon faces. As this problem is suspervised we we have labeled our real faces with 5 landmarks. The cartoons have aligned landmarks. To augment the data with a random crop
+we had to implement it by ourself in order to preserve the correct coordinates of the landmarks.
+
+#### Results
+It is hard to tell what exactly leads to the result we have. But we can show what we generate with and without landmark loss.
+
+![landmark vs original](doc/images/landmark-vs-original.png)
+
+We have a test image in the first column and its corresponding fake generated with enabled landmark loss in the
+second column. We see that the fake does not look exactly like the original cartoons in the third column. They cover
+some kind of facial expression as in the real image (e.g. viewing direction, perspective scaling of the right eye of the girl in the bottom). In the fourth column we have fakes without
+landmark loss, they capture more of the original distribution (e.g. the unnatural, direct look to the camera).
+We have to admit that we can not prove that this is all due to the landmark loss.
+
 
 ## Git Workflow
 Just use classic merge commits if you find out that someone has pushed in meantime.
