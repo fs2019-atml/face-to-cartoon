@@ -20,15 +20,41 @@ The CycleGAN approach respects the overall structure of the transformed input im
 
 ![demo](doc/images/cyclegan-demo.jpg)
 
-Using a CycleGAN 
+## Related approaches
 
-We plan to train a [CycleGAN](https://junyanz.github.io/CycleGAN/) on cartoon faces.
-
-## DCGAN
-We trained a vanilla DCGAN on the cartoon dataset (10k) in order to learn
-how to generate women with beards:
+### DCGAN
+The usual approach is to train directly on the discriminator loss and force the GAN to learn comics without restrictions.
+To start we trained a vanilla DCGAN leading to the following result.
 
 ![dcgan](doc/images/dcgan-fake-sample.png)
+
+The generator has learnt to combine various features of the cartoon dataset into new ones. But the results are not
+acceptable: deeper structures like same skin color everywhere have not been learnt.
+
+As the cartoon dataset contains women with beards we can not blame the generator. The input of the generator was
+gaussian noise and not real face images.
+
+### Vanilla CycleGAN
+Next thing to consider is the vanilla [CycleGAN](https://junyanz.github.io/CycleGAN/). The paper
+promises a more restriced environment for better results.
+The first results are acceptable. But we discover two problems: the first is a mode collapse: the generator only generates
+a few modes of the original cartoon dataset. The second is the liveliness in the generated cartoons: they look exactly like
+the cartoon data, but we want something inbetween. Humans turn and move their head and eyes. We would like to 
+incorporate this feature to the generated cartoons to have more correspondence between the input face and the generated cartoon.
+
+.. various image of the problems ..
+
+## Contributions
+
+### Landmark loss in CycleGAN
+We want to force more correspondence between the cartoon images and real faces. As both domains are faces we enforce
+correspondence on their landmarks: a fake should preserve the landmarks of the input image.
+To do so we add a new loss term called landmark loss next to the cycle and discriminator loss:
+![loss](doc/images/loss.png). In other words: during training time the generator gets his gradients from the discriminator, the cycle and the landmark detection. The balance of the lambdas which gives the weights to each loss are very important, as
+this landmark loss can now create a state where it is very easy for the discriminator to separate real from fakes.
+Experiments have shown that a small landmark lambda of 0.01 (the discriminator has a lambda of one) helps with the correspondence without destroying the overall learning.
+
+![landmark correspondences](doc/images/landmark-correspondences.png)
 
 ## Git Workflow
 Just use classic merge commits if you find out that someone has pushed in meantime.
