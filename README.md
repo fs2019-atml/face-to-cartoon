@@ -69,7 +69,6 @@ We have a test image in the first column and its corresponding fake generated wi
 second column. We see that the fake does not look exactly like the original cartoons in the third column. They cover
 some kind of facial expression as in the real image (e.g. viewing direction, perspective scaling of the right eye of the girl in the bottom). In the fourth column we have fakes without
 landmark loss, they capture more of the original distribution (e.g. the unnatural, direct look to the camera).
-We have to admit that we can not prove that this is all due to the landmark loss.
 
 
 ## Git Workflow
