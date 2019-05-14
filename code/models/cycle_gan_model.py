@@ -127,7 +127,7 @@ class CycleGANModel(BaseModel):
 
         """
         real_B = real_B.to(self.device)
-        fake_A = self.netG_A(real_B)
+        fake_A = self.netG_B(real_B)
         return fake_A
         
     #### END of code ####
