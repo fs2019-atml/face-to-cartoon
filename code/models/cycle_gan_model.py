@@ -3,7 +3,7 @@ import itertools
 from util.image_pool import ImagePool
 from .base_model import BaseModel
 from . import networks
-
+import numpy as np
 
 class CycleGANModel(BaseModel):
     """
@@ -81,13 +81,13 @@ class CycleGANModel(BaseModel):
         # define our custom networks and optimizers
         
         self.netG_A = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
-                                        not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
+                                        not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids, is_conditional=True)
         self.netG_B = networks.define_G(opt.output_nc, opt.input_nc, opt.ngf, opt.netG, opt.norm,
                                         not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
 
         if self.isTrain:  # define discriminators
             self.netD_A = networks.define_D(opt.output_nc, opt.ndf, opt.netD,
-                                            opt.n_layers_D, opt.norm, opt.init_type, opt.init_gain, self.gpu_ids)
+                                            opt.n_layers_D, opt.norm, opt.init_type, opt.init_gain, self.gpu_ids, is_conditional=True)
             self.netD_B = networks.define_D(opt.input_nc, opt.ndf, opt.netD,
                                             opt.n_layers_D, opt.norm, opt.init_type, opt.init_gain, self.gpu_ids)
             self.netLD_A = networks.define_LD(self.gpu_ids)
@@ -128,14 +128,24 @@ class CycleGANModel(BaseModel):
         self.ld_A = theA['ld'].to(self.device)
         self.ld_B = theB['ld'].to(self.device)
         self.image_paths = input['A_paths']
+
+        ### Get the class label of the cartoon image, and transform it into one-hot
+        self.real_B_cls_label = int(input['B_paths'][0].split('/')[-1].split('_')[0])
+        cls_num = 10
+        # Convert to one-hot format
+        self.cls_input = np.zeros((1,10,1,1))
+        self.cls_input[0,self.real_B_cls_label - 1,0,0] = 1
+        self.cls_input = torch.from_numpy(self.cls_input).float()
+
+        self.cls_input = self.cls_input.to(self.device)
         #### END of code ####
 
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
-        self.fake_B = self.netG_A(self.real_A)  # G_A(A)
+        self.fake_B = self.netG_A(self.real_A, self.cls_input)  # G_A(A)
         self.rec_A = self.netG_B(self.fake_B)   # G_B(G_A(A))
         self.fake_A = self.netG_B(self.real_B)  # G_B(B)
-        self.rec_B = self.netG_A(self.fake_A)   # G_A(G_B(B))
+        self.rec_B = self.netG_A(self.fake_A, self.cls_input)   # G_A(G_B(B))
 
     def backward_D_basic(self, netD, real, fake):
         """Calculate GAN loss for the discriminator
@@ -159,10 +169,24 @@ class CycleGANModel(BaseModel):
         loss_D.backward()
         return loss_D
 
+    def backward_condition_D_basic(self, netD, real, fake):
+        # Real
+        pred_real = netD(real, self.cls_input)
+        loss_D_real = self.criterionGAN(pred_real, True)
+        # Fake
+        pred_fake = netD(fake.detach(), self.cls_input)
+        loss_D_fake = self.criterionGAN(pred_fake, False)
+        # Combined loss
+        loss_D = (loss_D_real + loss_D_fake) * 0.5
+        # backward
+        loss_D.backward()
+        return loss_D
+
     def backward_D_A(self):
         """Calculate GAN loss for discriminator D_A"""
         fake_B = self.fake_B_pool.query(self.fake_B)
-        self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, fake_B)
+        # self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, fake_B)
+        self.loss_D_A = self.backward_condition_D_basic(self.netD_A, self.real_B, fake_B)
 
     def backward_D_B(self):
         """Calculate GAN loss for discriminator D_B"""
@@ -211,7 +235,7 @@ class CycleGANModel(BaseModel):
             self.loss_idt_B = 0
 
         # GAN loss D_A(G_A(A))
-        self.loss_G_A = self.criterionGAN(self.netD_A(self.fake_B), True)
+        self.loss_G_A = self.criterionGAN(self.netD_A(self.fake_B, self.cls_input), True)
         # GAN loss D_B(G_B(B))
         self.loss_G_B = self.criterionGAN(self.netD_B(self.fake_A), True)
         # GAN loss LD_A(G_A(A))

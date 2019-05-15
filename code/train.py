@@ -75,3 +75,7 @@ if __name__ == '__main__':
 
         print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.niter + opt.niter_decay, time.time() - epoch_start_time))
         model.update_learning_rate()                     # update learning rates at the end of every epoch.
+
+
+# Start to train: 
+# python train.py --dataroot ./datasets/faces --name cartoon_cyclegan --model cycle_gan

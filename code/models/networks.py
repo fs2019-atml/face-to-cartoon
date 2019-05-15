@@ -109,7 +109,7 @@ def init_net(net, init_type='normal', init_gain=0.02, gpu_ids=[]):
     return net
 
 
-def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, init_type='normal', init_gain=0.02, gpu_ids=[]):
+def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, init_type='normal', init_gain=0.02, gpu_ids=[], is_conditional=False):
     """Create a generator
 
     Parameters:
@@ -140,9 +140,15 @@ def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, in
     norm_layer = get_norm_layer(norm_type=norm)
 
     if netG == 'resnet_9blocks':
-        net = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=9)
+        if is_conditional is True:
+            net = CondResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=9)
+        else:
+            net = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=9)
     elif netG == 'resnet_6blocks':
-        net = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6)
+        if is_conditional is True:
+            net = CondResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6)
+        else:
+            net = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6)
     elif netG == 'unet_128':
         net = UnetGenerator(input_nc, output_nc, 7, ngf, norm_layer=norm_layer, use_dropout=use_dropout)
     elif netG == 'unet_256':
@@ -150,6 +156,139 @@ def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, in
     else:
         raise NotImplementedError('Generator model name [%s] is not recognized' % netG)
     return init_net(net, init_type, init_gain, gpu_ids)
+
+
+
+class CondResnetGenerator(nn.Module):
+
+    def conv_cond_concat(self, x, y):
+        """Concatenate conditioning vector on feature map axis."""
+
+        '''
+            x is the input feature, and y is the one-hot label (1,10, 1,1)
+
+            >> xshape= (64, 28, 28, 1)
+            >> yshape= (64, 1, 1, 10)
+            >> shape =  (64, 28, 28, 10)
+        '''
+        # x_shapes = x.Size()
+        # y_shapes = y.Size()
+
+        x_shapes = x.shape
+        y_shapes = y.shape
+        # torch.device('cuda:{}'.
+        torch_one = torch.ones([x_shapes[0],y_shapes[1], x_shapes[2], x_shapes[3] ], device=torch.device("cuda:0"))
+        return torch.cat([x , y*torch_one ], 1)
+
+    def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, n_blocks=6, padding_type='reflect' ):
+        print ('>>> CondResnetGenerator 1!!!!!!!!!!')
+        assert(n_blocks >= 0)
+        super(CondResnetGenerator, self).__init__()
+        self.input_nc = input_nc
+        self.output_nc = output_nc
+        self.ngf = ngf
+
+        self.use_dropout = use_dropout
+        self.n_blocks = n_blocks
+        self.padding_type = padding_type
+        self.norm_layer = norm_layer
+
+        if type(norm_layer) == functools.partial:
+            self.use_bias = norm_layer.func == nn.InstanceNorm2d
+        else:
+            self.use_bias = norm_layer == nn.InstanceNorm2d
+        
+        cls_num = 10
+        
+
+        conv1 = [nn.ReflectionPad2d(3),
+                 nn.Conv2d(self.input_nc+cls_num, self.ngf, kernel_size=7, padding=0,
+                           bias=self.use_bias),
+                 norm_layer(self.ngf),
+                 nn.ReLU(True)]
+        self.conv1 = nn.Sequential(*conv1)
+
+
+        n_downsampling = 2
+        for i in range(n_downsampling):
+            mult = 2**i
+            if i== 0:
+                conv2 = [nn.Conv2d(self.ngf * mult+cls_num, self.ngf * mult * 2, kernel_size=3,
+                                    stride=2, padding=1, bias=self.use_bias),
+                          norm_layer(self.ngf * mult * 2),
+                          nn.ReLU(True)]
+                self.conv2 = nn.Sequential(*conv2)
+
+            else:
+                conv3 = [nn.Conv2d(self.ngf * mult+cls_num, self.ngf * mult * 2, kernel_size=3,
+                                    stride=2, padding=1, bias=self.use_bias),
+                          norm_layer(self.ngf * mult * 2),
+                          nn.ReLU(True)]
+                self.conv3 = nn.Sequential(*conv3)
+
+            # _input = self.conv_cond_concat(_input, cls_input)
+            # _input = nn.Sequential(*sequence)(_input)
+
+        ### Residual Blocks
+
+        n_downsampling = 2
+        mult = 2**n_downsampling
+        resid_blocks = []
+        for i in range(n_blocks):
+            resid_blocks += [ResnetBlock(ngf * mult, padding_type=self.padding_type, norm_layer=self.norm_layer, use_dropout=self.use_dropout, use_bias=self.use_bias)]
+        self.resid_blocks = nn.Sequential(*resid_blocks)
+
+        ### Upsampling
+        model2 = []
+        for i in range(n_downsampling):
+            mult = 2**(n_downsampling - i)
+            model2 += [nn.ConvTranspose2d(ngf * mult, int(ngf * mult / 2),
+                                         kernel_size=3, stride=2,
+                                         padding=1, output_padding=1,
+                                         bias=self.use_bias),
+                      norm_layer(int(ngf * mult / 2)),
+                      nn.ReLU(True)]
+        model2 += [nn.ReflectionPad2d(3)]
+        model2 += [nn.Conv2d(ngf, output_nc, kernel_size=7, padding=0)]
+        model2 += [nn.Tanh()]
+
+
+        # self.model = nn.Sequential(*model)
+        self.model2 = nn.Sequential(*model2)
+
+
+
+
+    def forward(self, input, cls_input=None):
+        # return self.model(input)
+        # print '>>> !!!!!!!!!!!   CondResnetGenerator'
+        _input = self.conv_cond_concat(input, cls_input)
+        # _input = nn.Sequential(*sequence)(_input)
+        _input = self.conv1(_input)
+
+        _input = self.conv_cond_concat(_input, cls_input)
+        _input = self.conv2(_input)
+
+        _input = self.conv_cond_concat(_input, cls_input)
+        _input = self.conv3(_input)
+
+        # _input = self.conv_cond_concat(_input, cls_input)
+        _input = self.resid_blocks(_input)
+
+        _input = self.model2(_input)
+
+
+        return _input
+
+        
+
+        # fc_input: [batch_size, depth],
+        # self.fc_input = fc_input
+        # fc_flatten = tf.contrib.layers.fully_connected(fc_input, 64*64*64) 
+        # fc_reshape = tf.reshape(fc_flatten, shape)
+
+
+
 
 
 #### GROUP5 code ####
@@ -211,7 +350,7 @@ def define_LD(gpu_ids=[]):
 
 #### END of code ####
 
-def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal', init_gain=0.02, gpu_ids=[]):
+def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal', init_gain=0.02, gpu_ids=[],is_conditional=False):
     """Create a discriminator
 
     Parameters:
@@ -245,7 +384,11 @@ def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal'
     norm_layer = get_norm_layer(norm_type=norm)
 
     if netD == 'basic':  # default PatchGAN classifier
-        net = NLayerDiscriminator(input_nc, ndf, n_layers=3, norm_layer=norm_layer)
+        if is_conditional is True:
+            print ('>> Discriminator basic.... And conditonal is True...')
+            net = CondNLayerDiscriminator(input_nc, ndf, n_layers=3, norm_layer=norm_layer) #, use_sigmoid=use_sigmoid)
+        else:
+            net = NLayerDiscriminator(input_nc, ndf, n_layers=3, norm_layer=norm_layer) #, use_sigmoid=use_sigmoid)
     elif netD == 'n_layers':  # more options
         net = NLayerDiscriminator(input_nc, ndf, n_layers_D, norm_layer=norm_layer)
     elif netD == 'pixel':     # classify if each pixel is real or fake
@@ -253,6 +396,121 @@ def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal'
     else:
         raise NotImplementedError('Discriminator model name [%s] is not recognized' % net)
     return init_net(net, init_type, init_gain, gpu_ids)
+
+
+
+class CondNLayerDiscriminator(nn.Module):
+
+    def conv_cond_concat(self, x, y):
+        """Concatenate conditioning vector on feature map axis."""
+
+        '''
+            x is the input feature, and y is the one-hot label (1,10, 1,1)
+
+            >> xshape= (64, 28, 28, 1)
+            >> yshape= (64, 1, 1, 10)
+            >> shape =  (64, 28, 28, 10)
+        '''
+        # x_shapes = x.Size()
+        # y_shapes = y.Size()
+
+        x_shapes = x.shape
+        y_shapes = y.shape
+        # torch.device('cuda:{}'.
+        torch_one = torch.ones([x_shapes[0],y_shapes[1], x_shapes[2], x_shapes[3] ], device=torch.device("cuda:0"))
+        return torch.cat([x , y*torch_one ], 1)
+
+
+
+    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d, use_sigmoid=False):
+        super(CondNLayerDiscriminator, self).__init__()
+        # self.use_dropout = use_dropout
+        # self.n_blocks = n_blocks
+        # self.padding_type = padding_type
+        self.norm_layer = norm_layer
+        self.n_layers = 3
+        self.input_nc = input_nc
+        self.ndf = ndf
+
+        if type(norm_layer) == functools.partial:
+            self.use_bias = norm_layer.func == nn.InstanceNorm2d
+        else:
+            self.use_bias = norm_layer == nn.InstanceNorm2d
+
+
+        kw = 4
+        padw = 1
+        _cls_num = 10
+
+        conv1 = [
+            nn.Conv2d(self.input_nc+_cls_num, self.ndf, kernel_size=kw, stride=2, padding=padw),
+            nn.LeakyReLU(0.2, True)
+        ]
+        self.conv1 = nn.Sequential(*conv1)
+
+        nf_mult = 1
+        nf_mult_prev = 1
+        for n in range(1, self.n_layers):
+
+            if n==1:
+                nf_mult_prev = nf_mult
+                nf_mult = min(2**n, 8)
+                conv2 = [
+                    nn.Conv2d(self.ndf * nf_mult_prev+_cls_num, self.ndf * nf_mult,
+                              kernel_size=kw, stride=2, padding=padw, bias=self.use_bias),
+                    norm_layer(self.ndf * nf_mult),
+                    nn.LeakyReLU(0.2, True)
+                ]
+            elif n==2:
+                nf_mult_prev = nf_mult
+                nf_mult = min(2**n, 8)
+                conv3 = [
+                    nn.Conv2d(self.ndf * nf_mult_prev+_cls_num, self.ndf * nf_mult,
+                              kernel_size=kw, stride=2, padding=padw, bias=self.use_bias),
+                    norm_layer(self.ndf * nf_mult),
+                    nn.LeakyReLU(0.2, True)
+                ]
+        self.conv2 = nn.Sequential(*conv2)
+        self.conv3 = nn.Sequential(*conv3)
+            
+        ###
+
+        nf_mult_prev = nf_mult
+        nf_mult = min(2**n_layers, 8)
+        sequence = [
+            nn.Conv2d(self.ndf * nf_mult_prev, self.ndf * nf_mult,
+                      kernel_size=kw, stride=1, padding=padw, bias=self.use_bias),
+            norm_layer(self.ndf * nf_mult),
+            nn.LeakyReLU(0.2, True)
+        ]
+
+
+        sequence += [nn.Conv2d(self.ndf * nf_mult, 1, kernel_size=kw, stride=1, padding=padw)]
+
+        if use_sigmoid:
+            sequence += [nn.Sigmoid()]
+
+        self.conv4 = nn.Sequential(*sequence)
+
+    def forward(self, input, cls_input):
+        # cls_input: (1, C=10, 1,1)
+
+        _input = self.conv_cond_concat(input, cls_input)
+        # print '>> CondNLayerDiscriminator: _input=', _input.shape        
+        _input = self.conv1(_input)
+        
+        _input = self.conv_cond_concat(_input, cls_input)
+        _input = self.conv2(_input)
+
+        _input = self.conv_cond_concat(_input, cls_input)
+        _input = self.conv3(_input)
+
+
+        _input = self.conv4(_input)
+
+
+        return _input
+
 
 
 ##############################################################################
