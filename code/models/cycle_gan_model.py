@@ -151,8 +151,6 @@ class CycleGANModel(BaseModel):
         theB = input['B']
         self.real_A = theA['img'].to(self.device)
         
-        print('dimension of a', self.real_A.size())
-        
         self.real_B = theB['img'].to(self.device)
         self.ld_A = theA['ld'].to(self.device)
         self.ld_B = theB['ld'].to(self.device)
