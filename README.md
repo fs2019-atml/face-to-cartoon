@@ -113,7 +113,7 @@ To work on a task, put your name in the column and shout to slack!
 |-------------------------	|--------------------------------------------------------------------------------------------------------------------------------	|----------	|--------	|
 | Parse command line args 	| Provide a way to store and retrieve configurations.                                                                            	|          	|        	|
 | DataLoader              	| Load and preprocess (crop) images out of the folders trainA, trainB, testA, testB                                              	| Jan      	|        	|
-| CycleGAN Training       	| - Create some first architectures for the Generator{A2B, B2A} and Discriminator{A, B} Networks. - Implement training procedure 	| Gautam   	| Working on |
+| CycleGAN Training       	| - Create some first architectures for the Generator{A2B, B2A} and Discriminator{A, B} Networks. - Implement training procedure 	|    	      |         |
 | CycleGAN Test           	| - Implement test procedure "run GeneratorA2B"                                                                                  	|          	|        	|
 | Training Visualization  	| - Dump learning rates (per Network) - Dump network weights - visualize reconstruction "A to B to A"                            	|          	|        	|
 | Test Visualization      	| have fun ...                                                                                                                   	|          	|        	|

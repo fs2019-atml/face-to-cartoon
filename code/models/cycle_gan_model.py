@@ -113,6 +113,25 @@ class CycleGANModel(BaseModel):
         
         #### END of code ####
 
+    #### GROUP5 code ####
+    def gen_B(self, real_A):
+        """Runs and returns the forwardpass to generate a fake B
+
+        """
+        real_A = real_A.to(self.device)
+        fake_B = self.netG_A(real_A)
+        return fake_B
+    
+    def gen_A(self, real_B):
+        """Runs and returns the forwardpass to generate a fake A
+
+        """
+        real_B = real_B.to(self.device)
+        fake_A = self.netG_B(real_B)
+        return fake_A
+        
+    #### END of code ####
+
     def set_input(self, input):
         """Unpack input data from the dataloader and perform necessary pre-processing steps.
 
@@ -124,6 +143,9 @@ class CycleGANModel(BaseModel):
         theA = input['A']
         theB = input['B']
         self.real_A = theA['img'].to(self.device)
+        
+        print('dimension of a', self.real_A.size())
+        
         self.real_B = theB['img'].to(self.device)
         self.ld_A = theA['ld'].to(self.device)
         self.ld_B = theB['ld'].to(self.device)
