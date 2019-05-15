@@ -80,6 +80,9 @@ The basic idea would be: adding additional class label input of hair color to th
 Given one real face image input, we can have 10 cartoon generation with different hair colors.
 ![landmark vs original](doc/images/ConditionalOutput.png)
 
+But the model does not perform so well on test image with glasses, the reason may be that there are only small number of real face images with galsses in the training set. 
+![landmark vs original](doc/images/ConditionalOutput.png)
+
 
 ## Git Workflow
 Just use classic merge commits if you find out that someone has pushed in meantime.
