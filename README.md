@@ -81,7 +81,7 @@ Given one real face image input, we can have 10 cartoon generation with differen
 ![landmark vs original](doc/images/ConditionalOutput.png)
 
 But the model does not perform so well on test image with glasses, the reason may be that there are only small number of real face images with galsses in the training set. 
-![landmark vs original](doc/images/ConditionalOutput.png)
+![landmark vs original](doc/images/GlassResult.png)
 
 
 ## Git Workflow
