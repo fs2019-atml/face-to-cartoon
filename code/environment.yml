@@ -1,8 +1,9 @@
-name: pytorch-CycleGAN-and-pix2pix
+name: pytorch-cartoonfaces
 channels:
 - peterjc123
 - defaults
 dependencies:
+- cython
 - python=3.5.5
 - pytorch=0.4.1
 - scipy
