@@ -71,6 +71,16 @@ some kind of facial expression as in the real image (e.g. viewing direction, per
 landmark loss, they capture more of the original distribution (e.g. the unnatural, direct look to the camera).
 
 
+### Hair Color Control of Cartoon Image Generation by Conditional GAN
+After the training of cycleGAN, we only get one cartoon image output from an face image input. And we cannot have any control about the cartoon image generation, like the hair color, with/without glasses, etc.  Based on above observation, we hope we can control the hair color of cartoon image generation.  
+
+The basic idea would be: adding additional class label input of hair color to the generator and discriminator, instead of taking only real face image as input. Given a real face image, we can generate cartoon images in different hair color with different input of hair color class labels. 
+
+#### Results
+Given one real face image input, we can have 10 cartoon generation with different hair colors.
+![landmark vs original](doc/images/ConditionalOutput.png)
+
+
 ## Git Workflow
 Just use classic merge commits if you find out that someone has pushed in meantime.
 
