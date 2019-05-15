@@ -114,12 +114,19 @@ class CycleGANModel(BaseModel):
         #### END of code ####
 
     #### GROUP5 code ####
-    def gen_B(self, real_A):
+    def gen_B(self, real_A, cls_label=1):
         """Runs and returns the forwardpass to generate a fake B
-
+            control the style with cls_label={1..10}
         """
+        # hot encoding of class label
+        # TODO: create function
+        cls_input = np.zeros((1,10,1,1))
+        cls_input[0,cls_label - 1,0,0] = 1
+        cls_input = torch.from_numpy(cls_input).float()
+        cls_input = cls_input.to(self.device)
+        
         real_A = real_A.to(self.device)
-        fake_B = self.netG_A(real_A)
+        fake_B = self.netG_A(real_A, cls_input)
         return fake_B
     
     def gen_A(self, real_B):
@@ -153,8 +160,6 @@ class CycleGANModel(BaseModel):
 
         ### Get the class label of the cartoon image, and transform it into one-hot
         self.real_B_cls_label = int(input['B_paths'][0].split('/')[-1].split('_')[0])
-        cls_num = 10
-        # Convert to one-hot format
         self.cls_input = np.zeros((1,10,1,1))
         self.cls_input[0,self.real_B_cls_label - 1,0,0] = 1
         self.cls_input = torch.from_numpy(self.cls_input).float()
