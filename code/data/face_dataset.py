@@ -45,7 +45,7 @@ class FaceDataset(BaseDataset):
         assert opt.crop_size == 256
         
         # the wide size indicates the wide dimension before the random crop.
-        self.wide_size = 280        
+        self.wide_size = 280      
         
         # read out landmarks files to store paths and landmarks in A:
         
@@ -156,13 +156,14 @@ class FaceDataset(BaseDataset):
 
         # process landmarks on faces:
         # scale down 304 -> 280:
-        A_landmarks *= 280.0/304.0
+        A_landmarks *= self.wide_size/304.0
         # random crop: 280 -> 256        
         A_landmarks -= A_rand
         
         # process landmarks on cartoons:
         # center crop: 500 -> 280:
-        B_landmarks -= torch.Tensor([110, 110])
+        crop_xy = (500-self.wide_size)/2
+        B_landmarks -= torch.Tensor([crop_xy, crop_xy])
         # random crop: 280 -> 256
         B_landmarks -= B_rand
     
