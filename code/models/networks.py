@@ -141,12 +141,12 @@ def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, in
 
     if netG == 'resnet_9blocks':
         if is_conditional is True:
-            net = CondResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=9)
+            net = CondResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=9, gpu_ids=gpu_ids)
         else:
             net = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=9)
     elif netG == 'resnet_6blocks':
         if is_conditional is True:
-            net = CondResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6)
+            net = CondResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6, gpu_ids=gpu_ids)
         else:
             net = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6)
     elif netG == 'unet_128':
@@ -177,10 +177,11 @@ class CondResnetGenerator(nn.Module):
         x_shapes = x.shape
         y_shapes = y.shape
         # torch.device('cuda:{}'.
-        torch_one = torch.ones([x_shapes[0],y_shapes[1], x_shapes[2], x_shapes[3] ], device=torch.device("cuda:0"))
+        
+        torch_one = torch.ones([x_shapes[0],y_shapes[1], x_shapes[2], x_shapes[3] ], device=self.device)
         return torch.cat([x , y*torch_one ], 1)
 
-    def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, n_blocks=6, padding_type='reflect' ):
+    def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, n_blocks=6, padding_type='reflect',gpu_ids=[] ):
         print ('>>> CondResnetGenerator 1!!!!!!!!!!')
         assert(n_blocks >= 0)
         super(CondResnetGenerator, self).__init__()
@@ -193,6 +194,9 @@ class CondResnetGenerator(nn.Module):
         self.padding_type = padding_type
         self.norm_layer = norm_layer
 
+        self.gpu_ids = gpu_ids
+        self.device = torch.device('cuda:{}'.format(self.gpu_ids[0])) if self.gpu_ids else torch.device('cpu')
+        print ('in CondResnetGenerator: device=', self.device)
         if type(norm_layer) == functools.partial:
             self.use_bias = norm_layer.func == nn.InstanceNorm2d
         else:
@@ -386,7 +390,7 @@ def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal'
     if netD == 'basic':  # default PatchGAN classifier
         if is_conditional is True:
             print ('>> Discriminator basic.... And conditonal is True...')
-            net = CondNLayerDiscriminator(input_nc, ndf, n_layers=3, norm_layer=norm_layer) #, use_sigmoid=use_sigmoid)
+            net = CondNLayerDiscriminator(input_nc, ndf, n_layers=3, norm_layer=norm_layer, gpu_ids=gpu_ids) #, use_sigmoid=use_sigmoid)
         else:
             net = NLayerDiscriminator(input_nc, ndf, n_layers=3, norm_layer=norm_layer) #, use_sigmoid=use_sigmoid)
     elif netD == 'n_layers':  # more options
@@ -417,12 +421,13 @@ class CondNLayerDiscriminator(nn.Module):
         x_shapes = x.shape
         y_shapes = y.shape
         # torch.device('cuda:{}'.
-        torch_one = torch.ones([x_shapes[0],y_shapes[1], x_shapes[2], x_shapes[3] ], device=torch.device("cuda:0"))
+        # torch_one = torch.ones([x_shapes[0],y_shapes[1], x_shapes[2], x_shapes[3] ], device=torch.device("cuda:0"))
+        torch_one = torch.ones([x_shapes[0],y_shapes[1], x_shapes[2], x_shapes[3] ], device=self.device)
         return torch.cat([x , y*torch_one ], 1)
 
 
-
-    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d, use_sigmoid=False):
+        
+    def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d, use_sigmoid=False,gpu_ids=[]):
         super(CondNLayerDiscriminator, self).__init__()
         # self.use_dropout = use_dropout
         # self.n_blocks = n_blocks
@@ -431,6 +436,8 @@ class CondNLayerDiscriminator(nn.Module):
         self.n_layers = 3
         self.input_nc = input_nc
         self.ndf = ndf
+        self.gpu_ids = gpu_ids
+        self.device = torch.device('cuda:{}'.format(self.gpu_ids[0])) if self.gpu_ids else torch.device('cpu')
 
         if type(norm_layer) == functools.partial:
             self.use_bias = norm_layer.func == nn.InstanceNorm2d

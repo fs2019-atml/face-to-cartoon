@@ -13,7 +13,7 @@ else:
     VisdomExceptionBase = ConnectionError
 
 
-def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
+def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256, cls_label=1):
     """Save images to the disk.
 
     Parameters:
@@ -34,7 +34,7 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
 
     for label, im_data in visuals.items():
         im = util.tensor2im(im_data)
-        image_name = '%s_%s.png' % (name, label)
+        image_name = '%s_%s_%02d.png' % (name, label, cls_label)
         save_path = os.path.join(image_dir, image_name)
         h, w, _ = im.shape
         if aspect_ratio > 1.0:
