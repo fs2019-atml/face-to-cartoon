@@ -1,6 +1,7 @@
 from .base_model import BaseModel
 from . import networks
-
+import numpy as np
+import torch
 
 class TestModel(BaseModel):
     """ This TesteModel can be used to generate CycleGAN results for only one direction.
@@ -45,13 +46,13 @@ class TestModel(BaseModel):
         # specify the models you want to save to the disk. The training/test scripts will call <BaseModel.save_networks> and <BaseModel.load_networks>
         self.model_names = ['G' + opt.model_suffix]  # only generator is needed.
         self.netG = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
-                                        not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
+                                        not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids, is_conditional=True)
 
         # assigns the model to self.netG_[suffix] so that it can be loaded
         # please see <BaseModel.load_networks>
         setattr(self, 'netG' + opt.model_suffix, self.netG)  # store netG in self.
 
-    def set_input(self, input):
+    def set_input(self, input, cls_label=1):
         """Unpack input data from the dataloader and perform necessary pre-processing steps.
 
         Parameters:
@@ -62,9 +63,26 @@ class TestModel(BaseModel):
         self.real_A = input['A']['img'].to(self.device)
         self.image_paths = input['A_paths']
 
+        ### Get the class label of the cartoon image, and transform it into one-hot
+        self.real_B_cls_label = cls_label
+
+        if self.real_B_cls_label < 1 :
+            self.real_B_cls_label = 1
+        if self.real_B_cls_label > 10:
+            self.real_B_cls_label = 10
+
+        cls_num = 10
+        # Convert to one-hot format
+        self.cls_input = np.zeros((1,10,1,1))
+        self.cls_input[0,self.real_B_cls_label - 1,0,0] = 1
+        self.cls_input = torch.from_numpy(self.cls_input).float()
+
+        self.cls_input = self.cls_input.to(self.device)
+
+
     def forward(self):
         """Run forward pass."""
-        self.fake_B = self.netG(self.real_A)  # G(A)
+        self.fake_B = self.netG(self.real_A, cls_input=self.cls_input)  # G(A)
 
     def optimize_parameters(self):
         """No optimization for test model."""
