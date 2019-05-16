@@ -32,7 +32,7 @@ class TrainOptions(BaseOptions):
         parser.add_argument('--phase', type=str, default='train', help='train, val, test, etc')
         # training parameters
         parser.add_argument('--niter', type=int, default=100, help='# of iter at starting learning rate')
-        parser.add_argument('--niter_decay', type=int, default=100, help='# of iter to linearly decay learning rate to zero')
+        parser.add_argument('--niter_decay', type=int, default=200, help='# of iter to linearly decay learning rate to zero')
         parser.add_argument('--beta1', type=float, default=0.5, help='momentum term of adam')
         parser.add_argument('--lr', type=float, default=0.0002, help='initial learning rate for adam')
         parser.add_argument('--gan_mode', type=str, default='lsgan', help='the type of GAN objective. [vanilla| lsgan | wgangp]. vanilla GAN loss is the cross-entropy objective used in the original GAN paper.')
@@ -40,7 +40,7 @@ class TrainOptions(BaseOptions):
         parser.add_argument('--lr_policy', type=str, default='linear', help='learning rate policy. [linear | step | plateau | cosine]')
         parser.add_argument('--lr_decay_iters', type=int, default=50, help='multiply by a gamma every lr_decay_iters iterations')
         
-        parser.add_argument('-f', type=str, default='quickfix', help='The notebook kernel uses this option, so we provide it as dummy')
+        parser.add_argument('-f', type=str, default='ignore this', help='The notebook kernel uses this option, so we provide it as dummy')
 
         self.isTrain = True
         return parser

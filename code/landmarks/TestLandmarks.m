@@ -1,6 +1,6 @@
 %% load resized images to make a test sample
 
-impath_start = 'C:\Users\janse\Documents\cycleGAN\099000_resized\0';
+impath_start = 'C:\Users\saj3\Documents\cycleGAN\099000_resized\0';
 impath_end = '.png';
 
 images_resized = zeros(304,304,3,1000);
@@ -15,8 +15,8 @@ for i = 1:1000
 end
 
 %% test sample
-im_idx = 900; % e.g. '18' for '099018.png'
-marks = [114 143 190 143 154 184 116 220 190 219];
+im_idx = 919; % e.g. '18' for '099018.png'
+marks = [114 143 190 143 151 183 115 220 193 220];
 
 
 %% plot results
