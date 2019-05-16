@@ -297,8 +297,6 @@ class CondResnetGenerator(nn.Module):
 
 #### GROUP5 code ####
 # This is the network for the landmark detection
-# based on paper xxx. TODO: name?
-
 
 class LDNet(nn.Module):
     
