@@ -11,6 +11,23 @@ In order to incorporate additional prior knowledge to the architecture we add an
 
 To extend the usages of our model we provide a one to ten mapping of real faces to cartoon images: We make the whole architecutre conditional and train the models with ten different hair colors. You are free to choose your color!
 
+## How to train
+1) Clone this repo using `git clone https://github.com/fs2019-atml/face-to-cartoon.git`
+2) Get the dataset from google drive `https://drive.google.com/open?id=12vU_Dkn13KqsVy5LOYlpoTJGWmzPqPQh`
+3) Untar the archive to `./code/datasets/` to have all the images under `./code/datasets/faces/{cartoon, real}` (e.g. `tar xf faces.tar.gz` inside `./code/datasets`)
+4) Install dependencies (See below)
+5) a) Invoke `python train.py --gpu_ids=0` to train on cuda. b) Invoke `python train.py` to wait forever.
+
+### Dependencies
+We suggest an anaconda environment with the following:
+```
+conda install numpy pyyaml mkl mkl-include setuptools cmake cffi typing
+conda install pytorch torchvision -c pytorch # add cuda90 if CUDA 9 (or magma-cuda90)
+conda install visdom dominate -c conda-forge # install visdom and dominate
+```
+
+If you run in troubles with Cuda try to downgrade pytorch to version 0.41.
+
 ## Introduction
 Cartoons have their own field in illustration and every artist creates his own style and strokes. Once a style is settled, many artist are able to copy and adapt the patterns and exaggerations. Faces, on the other hand, are hard to draw and also to adapt in style: the right proportions and asymmetries have to match each other perfectly.
 
