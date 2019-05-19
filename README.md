@@ -1,15 +1,13 @@
 # Conditional cartoon faces incorporating a landmark loss in CycleGAN
-We learn how to map a face to a cartoon-face only using unpaired data. For a certain face the mapping to a cartoon style is a complex function ![functionG](doc/images/function-g.png). The goal of this project is to learn this function! As starting point we choose CycleGAN.
-CycleGAN promises to learn the mapping from
-![functionG](doc/images/function-g.png) and its reverse ![functionH](doc/images/function-h.png)
-using unpaired data. The main idea is to minimize the loss of the transitive "cycle" ![eq](doc/images/transitive.png).
-As well as a standard GAN Discriminator losses of each mapping function.
 
-Our contributions:
+## Report
+The `Report.ipynb` covers the details of the project.
 
-In order to incorporate additional prior knowledge to the architecture we add another loss term based on landmark predictions. For both: the cartoons and the real images.
+## Demo
+You find an interactive Demo und `code/Demo.ipynb`.
 
-To extend the usages of our model we provide a one to ten mapping of real faces to cartoon images: We make the whole architecutre conditional and train the models with ten different hair colors. You are free to choose your color!
+## Code
+More details to the code are in `code/README.md`.
 
 ## How to train
 1) Clone this repo using `git clone https://github.com/fs2019-atml/face-to-cartoon.git`
@@ -27,6 +25,25 @@ conda install visdom dominate -c conda-forge # install visdom and dominate
 ```
 
 If you run in troubles with Cuda try to downgrade pytorch to version 0.41.
+
+
+
+
+# Deprecated:
+
+We learn how to map a face to a cartoon-face only using unpaired data. For a certain face the mapping to a cartoon style is a complex function ![functionG](doc/images/function-g.png). The goal of this project is to learn this function! As starting point we choose CycleGAN.
+CycleGAN promises to learn the mapping from
+![functionG](doc/images/function-g.png) and its reverse ![functionH](doc/images/function-h.png)
+using unpaired data. The main idea is to minimize the loss of the transitive "cycle" ![eq](doc/images/transitive.png).
+As well as a standard GAN Discriminator losses of each mapping function.
+
+Our contributions:
+
+In order to incorporate additional prior knowledge to the architecture we add another loss term based on landmark predictions. For both: the cartoons and the real images.
+
+To extend the usages of our model we provide a one to ten mapping of real faces to cartoon images: We make the whole architecutre conditional and train the models with ten different hair colors. You are free to choose your color!
+
+
 
 ## Introduction
 Cartoons have their own field in illustration and every artist creates his own style and strokes. Once a style is settled, many artist are able to copy and adapt the patterns and exaggerations. Faces, on the other hand, are hard to draw and also to adapt in style: the right proportions and asymmetries have to match each other perfectly.
