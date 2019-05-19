@@ -4,7 +4,7 @@
 The `Report.ipynb` covers the details of the project.
 
 ## Demo
-You find an interactive Demo und `code/Demo.ipynb`.
+You find an interactive demo under `code/Demo.ipynb`.
 
 ## Code
 More details to the code are in `code/README.md`.
