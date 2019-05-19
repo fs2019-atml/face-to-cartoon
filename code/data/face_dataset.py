@@ -146,7 +146,6 @@ class FaceDataset(BaseDataset):
         B_rand = self.get_rand_upperleft()
         B_img = self.random_crop(B_img, B_rand)
 
-
         # full size cartoon landmarks:
         B_landmarks = torch.tensor([self.ld(205, 261),
                                     self.ld(295, 261),
