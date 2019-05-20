@@ -166,9 +166,6 @@ class FaceDataset(BaseDataset):
         # random crop: 280 -> 256
         B_landmarks -= B_rand
     
-        
-        # TODO: add the conditional encoding here to the B stuff
-    
         # apply image transformation
         A = {'img': self.transform_A(A_img), 'ld': A_landmarks}
         B = {'img': self.transform_B(B_img), 'ld': B_landmarks}        

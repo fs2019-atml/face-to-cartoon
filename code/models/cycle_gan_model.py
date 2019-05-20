@@ -119,7 +119,6 @@ class CycleGANModel(BaseModel):
             control the style with cls_label={1..10}
         """
         # hot encoding of class label
-        # TODO: create function
         cls_input = np.zeros((1,10,1,1))
         cls_input[0,cls_label - 1,0,0] = 1
         cls_input = torch.from_numpy(cls_input).float()

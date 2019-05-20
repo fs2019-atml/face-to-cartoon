@@ -158,9 +158,10 @@ def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, in
     return init_net(net, init_type, init_gain, gpu_ids)
 
 
-
 class CondResnetGenerator(nn.Module):
 
+    #### GROUP5 code ####
+    
     def conv_cond_concat(self, x, y):
         """Concatenate conditioning vector on feature map axis."""
 
@@ -176,10 +177,11 @@ class CondResnetGenerator(nn.Module):
 
         x_shapes = x.shape
         y_shapes = y.shape
-        # torch.device('cuda:{}'.
         
         torch_one = torch.ones([x_shapes[0],y_shapes[1], x_shapes[2], x_shapes[3] ], device=self.device)
         return torch.cat([x , y*torch_one ], 1)
+
+    #### End of Code ####
 
     def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, n_blocks=6, padding_type='reflect',gpu_ids=[] ):
         print ('>>> CondResnetGenerator 1!!!!!!!!!!')
@@ -264,6 +266,9 @@ class CondResnetGenerator(nn.Module):
 
 
     def forward(self, input, cls_input=None):
+        #### GROUP5 code ####
+        # The original ResentGenerator enhanced with conditional architecture (one-hot encoded)
+        
         # return self.model(input)
         # print '>>> !!!!!!!!!!!   CondResnetGenerator'
         _input = self.conv_cond_concat(input, cls_input)
@@ -284,13 +289,7 @@ class CondResnetGenerator(nn.Module):
 
         return _input
 
-        
-
-        # fc_input: [batch_size, depth],
-        # self.fc_input = fc_input
-        # fc_flatten = tf.contrib.layers.fully_connected(fc_input, 64*64*64) 
-        # fc_reshape = tf.reshape(fc_flatten, shape)
-
+        #### END of code ####
 
 
 
@@ -303,7 +302,6 @@ class LDNet(nn.Module):
     def __init__(self):
         super(LDNet, self).__init__()
         self.conv = nn.Sequential(
-            # TODO: udpate for 256!!!
             # image input: 3x256x256
             nn.Conv2d(3,20,5),
             # output: 20x252x252
@@ -314,9 +312,9 @@ class LDNet(nn.Module):
             # output: 40x80x80
             nn.LeakyReLU(0.2),
             nn.MaxPool2d(3),
-            # output: 40x26.6x26.6
+            # output: 40x26.6x26
             nn.Conv2d(40,60,5),
-            # output: 60x22.6x22.6...
+            # output: 60x22.6x22
             nn.LeakyReLU(0.2),
             nn.MaxPool2d(2),
             # output: 60x11x11
@@ -328,9 +326,6 @@ class LDNet(nn.Module):
             nn.Conv2d(80, 100, 3),
             #output: 100x1x1
             
-            #nn.LeakyReLU(0.2),
-            #nn.MaxPool2d(2)
-            #output 100x2x2
             )
             
         # linear (maybe add more layers here:)
