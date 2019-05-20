@@ -1,6 +1,6 @@
 # Code notes
 Our contributions are declared using the following comment:
-`#### GROUP5 code ####` and `#### END of code ####`.
+`#### GROUP5 code ####` and `#### END of code ####`. Finding them using grep: `grep -rnw . -e 'GROUP5'`.
 
 Most are found under
 * `data/face_dataset.py` (our own data handling and augmentation incorporating landmarks)
