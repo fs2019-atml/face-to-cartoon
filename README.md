@@ -12,7 +12,7 @@ More details to the code are in `code/README.md`.
 ## How to train
 1) Clone this repo using `git clone https://github.com/fs2019-atml/face-to-cartoon.git`
 2) Get the dataset from google drive `https://drive.google.com/open?id=12vU_Dkn13KqsVy5LOYlpoTJGWmzPqPQh`
-3) Untar the archive to `./code/datasets/` to have all the images under `./code/datasets/faces/{cartoon, real}` (e.g. `tar xf faces.tar.gz` inside `./code/datasets`)
+3) Untar the archive to `./code/datasets/` to have all the images under `./code/datasets/faces/{cartoon/*, real/*}` (e.g. `tar xf faces.tar.gz` inside `./code/datasets`)
 4) Install dependencies (See below)
 5) a) Invoke `python train.py --gpu_ids=0` to train on cuda. b) Invoke `python train.py` to wait forever.
 
