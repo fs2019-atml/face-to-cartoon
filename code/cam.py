@@ -33,6 +33,9 @@ opt.no_flip = True    # no flip; comment this line if results on flipped images 
 opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
 opt.phase = 'test'
 opt.epoch = 'latest'
+#opt.name="cartoonfaces"
+opt.name="cartoonfaces-ld0_0001"
+#opt.name="cartoonfaces-ld0_00001"
 
 # hack a bit to get it up and running:
 opt.isTrain = False
@@ -40,7 +43,10 @@ model = create_model(opt)      # create a model given opt.model and other option
 model.isTrain = False # fix this
 model.setup(opt)               # regular setup: load and print networks; create schedulers
 
-brightness = 0.3
+# setup dataset
+dataset = create_dataset(opt)
+
+brightness = 0.5
 
 transform = transforms.Compose([torchvision.transforms.functional.hflip,
                                 transforms.CenterCrop(256),
@@ -64,6 +70,31 @@ def to_image(tensor, nrow=8, padding=2,
     im = Image.fromarray(ndarr)
     return im
 
+def to_image2(tensor):
+    nparray = tensor2im(tensor)
+    im = Image.fromarray(nparray)
+    return im
+
+def tensor2im(input_image, imtype=np.uint8):
+    """"Converts a Tensor array into a numpy image array.
+
+    Parameters:
+        input_image (tensor) --  the input image tensor array
+        imtype (type)        --  the desired type of the converted numpy array
+    """
+    if not isinstance(input_image, np.ndarray):
+        if isinstance(input_image, torch.Tensor):  # get the data from a variable
+            image_tensor = input_image.data
+        else:
+            return input_image
+        image_numpy = image_tensor[0].cpu().float().numpy()  # convert it into a numpy array
+        if image_numpy.shape[0] == 1:  # grayscale to RGB
+            image_numpy = np.tile(image_numpy, (3, 1, 1))
+        image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
+    else:  # if it is a numpy array, do nothing
+        image_numpy = input_image
+    return image_numpy.astype(imtype)
+
 def concatenate(images):
     widths, heights = zip(*(i.size for i in images))
     total_width = sum(widths)
@@ -74,6 +105,21 @@ def concatenate(images):
         result.paste(im, (x_offset,0))
         x_offset += im.size[0]
     return result
+
+
+show_cartoon_to_face = False
+if (show_cartoon_to_face):
+    for i, data in enumerate(dataset):    
+        theB = data['B']
+        real_B = theB['img']
+        #img_B = to_image2(real_B[0,:,:,:])
+        img_B = to_image2(real_B)
+        img_A = model.gen_A(real_B)
+        img_A = to_image2(img_A)
+        img_BA = concatenate([img_B, img_A])
+        img_BA.save('real.jpg')
+        
+        print('real generated')
 
 while(True):
     # Capture drop buffer
@@ -94,14 +140,14 @@ while(True):
     pil_img = Image.fromarray(cvframe)
     img = transform(pil_img)
     img = img.view(1, 3, 256, 256)
-    img_A = to_image(img[0, :, :, :])
+    img_A = to_image2(img)
     img_B = model.gen_B(img)
     #torchvision.utils.save_image(img_B[0, :, :, :], 'comic.png')
-    img_B = to_image(img_B[0, :, :, :])
+    img_B = to_image2(img_B)
     img_AB = concatenate([img_A, img_B])
     img_AB.save('comic.jpg')
     
-    print('comic converted')
+    print('real generated')
 
     #print(frame.shape, " ", cropped_frame.shape, " ", resized_frame.shape)
 
