@@ -1,7 +1,7 @@
 # Conditional cartoon faces incorporating a landmark loss in CycleGAN
 
 ## Report
-The `Report.ipynb` covers the details of the project.
+The `Report_FaceToCartoon.ipynb ` covers the details of the project.
 
 ## Demo
 You find an interactive demo under `code/Demo.ipynb`.
